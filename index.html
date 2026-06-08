@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pelada EARJ Terças — Estatísticas</title>
+
+  <!-- Favicon (emoji ⚽ como SVG — zero arquivo extra) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
+
+  <!-- Open Graph / WhatsApp preview -->
+  <meta property="og:title"       content="Pelada EARJ Terças — Estatísticas" />
+  <meta property="og:description" content="Histórico completo das peladas de terça-feira na Escola Americana do Rio de Janeiro. Rankings, partidas e estatísticas desde 2022." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:locale"      content="pt_BR" />
+  <meta name="description" content="Histórico completo das peladas de terça-feira na Escola Americana do Rio de Janeiro. Rankings, partidas e estatísticas desde 2022." />
+
+  <!-- Dark mode: aplica o tema ANTES do CSS pintar a tela (evita flash) -->
+  <script>
+    (function () {
+      var stored = localStorage.getItem('pelada-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else if (stored === 'light') {
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="style_v2.css?v=15" />
+</head>
+<body>
+  <!-- ════════════ LOADING OVERLAY ════════════ -->
+  <div id="loading-overlay" aria-label="Carregando" role="status">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Carregando estatísticas…</p>
+  </div>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-crest-wrap">
+        <svg class="site-crest" viewBox="0 0 52 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Escudo Pelada EARJ Terças" role="img">
+          <!-- Metade esquerda: Preto -->
+          <path d="M26 2 L26 60 C26 60 2 49 2 35 L2 11 Z" fill="var(--preto-bg)"/>
+          <!-- Metade direita: Branco -->
+          <path d="M26 2 L50 11 L50 35 C50 49 26 60 26 60 Z" fill="var(--branco-bg)"/>
+          <!-- Borda do escudo -->
+          <path d="M26 2 L50 11 L50 35 C50 49 26 60 26 60 C26 60 2 49 2 35 L2 11 Z"
+                fill="none" stroke="var(--border-strong)" stroke-width="2" stroke-linejoin="round"/>
+          <!-- Linha central divisória -->
+          <line x1="26" y1="2" x2="26" y2="60" stroke="var(--border-strong)" stroke-width="1"/>
+          <!-- Bola de futebol: círculo -->
+          <circle cx="26" cy="27" r="10" stroke="var(--text-muted)" stroke-width="1.5"/>
+          <!-- Pêntagono superior (patch clássico do Telstar) -->
+          <path d="M26 18 L29.1 20.3 L27.9 23.8 L24.1 23.8 L22.9 20.3 Z"
+                fill="var(--text-muted)" opacity="0.55"/>
+          <!-- Patch inferior (sutil) -->
+          <path d="M26 36 L22.9 33.7 L24.1 30.2 L27.9 30.2 L29.1 33.7 Z"
+                fill="var(--text-muted)" opacity="0.28"/>
+          <!-- Texto EARJ -->
+          <text x="26" y="53" text-anchor="middle"
+                font-size="5" font-weight="800" letter-spacing="1.5"
+                font-family="-apple-system, BlinkMacSystemFont, sans-serif"
+                fill="var(--text-muted)">EARJ</text>
+        </svg>
+      </div>
+      <div class="site-header-text">
+        <h1>Pelada EARJ Terças</h1>
+        <p class="subtitle">Estatísticas históricas — terças-feiras na Escola Americana do Rio de Janeiro</p>
+        <p class="header-ultima-partida">Última partida: <span id="header-ultima-partida">—</span></p>
+      </div>
+      <button class="dark-toggle" id="dark-toggle" title="Alternar modo escuro" aria-label="Alternar modo escuro">🌙</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="container">
+      <button class="tab-btn active" data-tab="rankings">Rankings</button>
+      <button class="tab-btn" data-tab="jogadores">Jogadores</button>
+      <button class="tab-btn" data-tab="partidas">Partidas</button>
+      <button class="tab-btn" data-tab="recordes">Recordes</button>
+      <button class="tab-btn" data-tab="comparar">Comparar</button>
+      <button class="tab-btn" data-tab="sobre">Sobre</button>
+    </div>
+  </nav>
+
+  <!-- ════════════ DESTAQUES DA TEMPORADA ════════════ -->
+  <section class="destaques-section" id="destaques-section" style="display:none">
+    <div class="container">
+
+      <!-- Cabeçalho com seletor de temporada -->
+      <div class="destaques-header">
+        <h2 class="destaques-titulo">⚽ Destaques <span id="destaques-ano-label">2025</span></h2>
+        <div class="destaques-ano-pills" id="destaques-ano-pills"></div>
+      </div>
+
+      <!-- Cards de estatísticas gerais -->
+      <div class="destaques-grid" id="destaques-grid"></div>
+
+      <!-- Destaques individuais -->
+      <div class="destaques-individuais" id="destaques-individuais"></div>
+
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- ════════════ RANKINGS ════════════ -->
+    <section id="tab-rankings" class="tab-panel active">
+      <div class="tab-with-sidebar">
+
+        <!-- Sidebar de anos -->
+        <aside class="year-sidebar" id="ranking-sidebar">
+          <div class="sidebar-header">
+            <button class="sidebar-toggle-btn" id="ranking-sidebar-toggle" title="Recolher">‹</button>
+            <span class="sidebar-heading">Temporadas</span>
+          </div>
+          <div class="sidebar-inner">
+            <nav id="ranking-sidebar-nav"></nav>
+          </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <div class="tab-main-content">
+
+          <!-- Filtro por mês -->
+          <div class="mes-filter-bar" id="mes-filter-bar" style="display:none">
+            <span class="mes-filter-label">📅 Mês:</span>
+            <div class="mes-filter-pills" id="mes-filter-pills"></div>
+          </div>
+
+          <div class="filters">
+            <div class="filter-group">
+              <label>Filtro</label>
+              <div id="filter-metrica" class="pill-group">
+                <div class="pill-subgroup">
+                  <span class="pill-group-label">Desempenho</span>
+                  <div class="pill-subgroup-row">
+                    <button class="pill active" data-metrica="pontos">🏆 Pontos</button>
+                    <button class="pill" data-metrica="aproveitamento">📈 Aproveit.</button>
+                    <button class="pill" data-metrica="aproveitamento_pior">📉 Pior Aprov.</button>
+                    <button class="pill" data-metrica="jogos">🏟️ Jogos</button>
+                  </div>
+                </div>
+                <span class="pill-sep"></span>
+                <div class="pill-subgroup">
+                  <span class="pill-group-label">Ataque</span>
+                  <div class="pill-subgroup-row">
+                    <button class="pill" data-metrica="gols">⚽ Gols</button>
+                    <button class="pill" data-metrica="assists">👟 Assists</button>
+                    <button class="pill" data-metrica="g_a">🎯 G+A</button>
+                    <button class="pill" data-metrica="g_a_jogo">🎯 G+A/J</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Mostrar</label>
+              <div class="pill-group">
+                <button class="pill active" data-limite="10">Top 10</button>
+                <button class="pill" data-limite="20">Top 20</button>
+                <button class="pill" data-limite="0">Todos</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ranking-meta" id="ranking-meta"></div>
+
+          <div class="ranking-grid">
+            <div class="ranking-block">
+
+              <!-- Toggle Jogadores / Goleiros -->
+              <div class="ranking-type-tabs">
+                <button class="ranking-type-btn active" data-tipo="linha">⚽ Jogadores de linha</button>
+                <button class="ranking-type-btn" data-tipo="goleiros">🧤 Goleiros</button>
+                <button class="ranking-type-btn" data-tipo="corrida">🏁 Corrida</button>
+              </div>
+
+              <!-- Painel: Jogadores de linha -->
+              <div id="panel-linha" class="ranking-type-panel">
+                <h2 id="ranking-title">🏆 Pontos — Geral</h2>
+                <div class="table-scroll-wrap">
+                <table class="data-table" id="ranking-table">
+                  <thead>
+                    <tr>
+                      <th class="num">#</th>
+                      <th>Jogador</th>
+                      <th class="num sortable" data-sort="pontos">🏆 Pts</th>
+                      <th class="num sortable" data-sort="jogos">🏟️ J</th>
+                      <th class="num sortable" data-sort="vitorias">✅ V</th>
+                      <th class="num sortable" data-sort="empates">🤝 E</th>
+                      <th class="num sortable" data-sort="derrotas">❌ D</th>
+                      <th class="num sortable" data-sort="gols">⚽ G</th>
+                      <th class="num sortable" data-sort="assists">👟 A</th>
+                      <th class="num sortable" data-sort="g_a">🎯 G+A</th>
+                      <th class="num sortable" data-sort="g_a_jogo">🎯 /J</th>
+                      <th class="num sortable" data-sort="aproveitamento">📈 %</th>
+                      <th class="num sortable th-presenca" data-sort="presenca">📅 %</th>
+                      <th>Últimos 5 jogos</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                </div>
+              </div>
+
+              <!-- Painel: Goleiros -->
+              <div id="panel-goleiros" class="ranking-type-panel" style="display:none">
+                <h2>🧤 Goleiros</h2>
+                <div class="table-scroll-wrap">
+                <table class="data-table" id="goleiros-table">
+                  <thead>
+                    <tr>
+                      <th class="num">#</th>
+                      <th>Goleiro</th>
+                      <th class="num">J</th>
+                      <th class="num">V</th>
+                      <th class="num">E</th>
+                      <th class="num">D</th>
+                      <th class="num">🏆 Pts</th>
+                      <th class="num">📈 %</th>
+                      <th>Forma</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                </div>
+              </div>
+
+            </div>
+
+              <!-- Painel: Corrida do Ranking -->
+              <div id="panel-corrida" class="ranking-type-panel" style="display:none">
+                <div id="corrida-chart-container"></div>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════ JOGADORES ════════════ -->
+    <section id="tab-jogadores" class="tab-panel">
+      <div class="filters" style="padding-top:12px; padding-bottom:12px; margin-top:24px; margin-bottom:16px;">
+        <div class="filter-group filter-group--grow">
+          <label for="busca-input">🔍 Buscar jogador</label>
+          <input id="busca-input" type="search" placeholder="Digite parte do nome…" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="jogadores-layout" id="jogadores-layout">
+        <div class="jogadores-list">
+          <table class="data-table" id="jogadores-table">
+            <thead>
+              <tr>
+                <th>Jogador</th>
+                <th class="num">🏟️ J</th>
+                <th class="num">🏆 Pts</th>
+                <th class="num">⚽ G</th>
+                <th class="num">👟 A</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <aside class="jogador-detalhe" id="jogador-detalhe">
+          <p class="placeholder">Selecione um jogador para ver o histórico completo.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ════════════ PARTIDAS ════════════ -->
+    <section id="tab-partidas" class="tab-panel">
+      <div class="tab-with-sidebar">
+
+        <!-- Sidebar de anos/meses -->
+        <aside class="year-sidebar" id="partidas-sidebar">
+          <div class="sidebar-header">
+            <button class="sidebar-toggle-btn" id="partidas-sidebar-toggle" title="Recolher">‹</button>
+            <span class="sidebar-heading">Temporadas</span>
+          </div>
+          <div class="sidebar-inner">
+            <nav id="partidas-sidebar-nav"></nav>
+          </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <div class="tab-main-content">
+          <div class="filters" style="padding-top:12px; padding-bottom:12px; margin-bottom:20px;">
+            <div class="filter-group filter-group--grow">
+              <label for="busca-partida">🔍 Buscar (jogador ou data DD/MM/AAAA)</label>
+              <input id="busca-partida" type="search" placeholder="Ex: Rondinelli ou 30/03/2026" autocomplete="off" />
+            </div>
+          </div>
+
+          <div id="partidas-content"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════ RECORDES ════════════ -->
+    <section id="tab-recordes" class="tab-panel">
+      <div id="recordes-content" class="rec-outer"></div>
+    </section>
+
+    <!-- ════════════ COMPARAR ════════════ -->
+    <section id="tab-comparar" class="tab-panel">
+      <div class="container" style="padding-top:24px">
+        <h2 style="margin-bottom:16px">⚔️ Comparação Head-to-Head</h2>
+        <div id="comparar-content"></div>
+      </div>
+    </section>
+
+    <!-- ════════════ SOBRE ════════════ -->
+    <section id="tab-sobre" class="tab-panel">
+      <div class="prose-panel">
+        <article class="prose">
+          <h2>⚽ Sobre a Pelada EARJ Terças</h2>
+          <p>
+            Toda terça-feira, um grupo se reúne na Escola Americana do Rio de Janeiro
+            (EARJ) para o tradicional futebol entre os times <strong>Preto</strong> e
+            <strong>Branco</strong>. Esta página reúne o histórico de todas as partidas registradas
+            desde 2022.
+          </p>
+          <h3>Como ler os dados</h3>
+          <ul>
+            <li><strong>🏆 Pontos:</strong> 3 por vitória, 1 por empate, 0 por derrota.</li>
+            <li><strong>📈 Aproveitamento:</strong> % de pontos sobre o máximo possível (jogos × 3).</li>
+            <li><strong>🎯 G+A:</strong> soma de gols e assistências.</li>
+            <li><strong>Forma:</strong> últimas 5 partidas (✅ V · 🤝 E · ❌ D).</li>
+            <li>🧤 Goleiros aparecem em tabela separada nos rankings.</li>
+          </ul>
+          <h3>Atualização</h3>
+          <p id="sobre-meta">Carregando metadados…</p>
+          <p class="muted">
+            Mantido por Rafael Rondinelli a partir da planilha histórica
+            <code>fut earj_terças_v1.xlsx</code>.
+          </p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span>⚽ Pelada EARJ Terças — Última partida: <span id="footer-ultima-partida">—</span> · Gerado em <span id="footer-data">—</span></span>
+    </div>
+  </footer>
+
+  <!-- ════════════ MOBILE BAR ════════════ -->
+  <div class="mobile-bar hidden" id="mobile-bar">
+    <button class="mobile-bar-btn" id="mb-temporada">
+      <span class="mb-icon">📅</span>
+      <span class="mb-lbl">Temporada</span>
+    </button>
+    <div class="mobile-bar-status" id="mobile-bar-status"></div>
+    <button class="mobile-bar-btn" id="mb-filtros">
+      <span class="mb-icon">⚙️</span>
+      <span class="mb-lbl">Filtros</span>
+    </button>
+  </div>
+
+  <!-- ════════════ BOTTOM SHEETS ════════════ -->
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+
+  <div class="mobile-sheet" id="sheet-temporada">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">📅 Temporada</h3>
+    <div class="sheet-body" id="sheet-temporada-body"></div>
+  </div>
+
+  <div class="mobile-sheet" id="sheet-filtros">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">⚙️ Filtros</h3>
+    <div class="sheet-body" id="sheet-filtros-body"></div>
+  </div>
+
+  <div class="mobile-sheet" id="sheet-partidas-temporada">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">📅 Temporada — Partidas</h3>
+    <div class="sheet-body" id="sheet-partidas-temporada-body"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app_v2.js?v=15"></script>
+
+  <!-- Esconde o overlay após a inicialização da app -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var overlay = document.getElementById('loading-overlay');
+      if (!overlay) return;
+      overlay.classList.add('hidden');
+      setTimeout(function () { overlay.remove(); }, 400);
+    });
+  </script>
+
+  <!-- Dark mode toggle logic -->
+  <script>
+    (function () {
+      var btn = document.getElementById('dark-toggle');
+      var html = document.documentElement;
+
+      function isDark() { return html.classList.contains('dark'); }
+
+      function applyTheme(dark) {
+        html.classList.toggle('dark',  dark);
+        html.classList.toggle('light', !dark);
+        btn.textContent = dark ? '☀️' : '🌙';
+        btn.title       = dark ? 'Mudar para modo claro' : 'Mudar para modo escuro';
+        localStorage.setItem('pelada-theme', dark ? 'dark' : 'light');
+      }
+
+      // Sincroniza ícone com o tema já aplicado pelo script do <head>
+      btn.textContent = isDark() ? '☀️' : '🌙';
+      btn.title       = isDark() ? 'Mudar para modo claro' : 'Mudar para modo escuro';
+
+      btn.addEventListener('click', function () { applyTheme(!isDark()); });
+
+      // Atualiza se o sistema mudar (apenas quando não há preferência manual)
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (!localStorage.getItem('pelada-theme')) applyTheme(e.matches);
+      });
+    })();
+  </script>
+</body>
+</html>
