@@ -1996,7 +1996,8 @@ function computeH2H(nome1, nome2, anoFiltro) {
 
   const r = { total: comuns.length, mesmo_time: 0, opostos: 0,
               j1: {v:0,e:0,d:0,pts:0,gols:0,assists:0},
-              j2: {v:0,e:0,d:0,pts:0,gols:0,assists:0} };
+              j2: {v:0,e:0,d:0,pts:0,gols:0,assists:0},
+              juntos: {v:0,e:0,d:0,pts:0,gols1:0,gols2:0,assists1:0,assists2:0} };
 
   for (const dt of comuns) {
     const p1 = map1.get(dt), p2 = map2.get(dt);
@@ -2007,6 +2008,13 @@ function computeH2H(nome1, nome2, anoFiltro) {
     // Se um dos dois não tem time conhecido → conta como mesmo_time (indeterminado)
     if (!t1 || !t2 || t1 === t2) {
       r.mesmo_time++;
+      // Como dupla: contribuição individual de cada um nessas partidas
+      r.juntos.gols1    += p1.gols;    r.juntos.gols2    += p2.gols;
+      r.juntos.assists1 += p1.assists; r.juntos.assists2 += p2.assists;
+      // Mesmo time → resultado compartilhado. Prefere o registrado; senão deduz pelo placar.
+      const resD = p1.resultado || p2.resultado || deduceResultado(p1) || deduceResultado(p2);
+      r.juntos.v += resD==='V'?1:0; r.juntos.e += resD==='E'?1:0;
+      r.juntos.d += resD==='D'?1:0; r.juntos.pts += (resD==='V'?3:resD==='E'?1:0);
     } else {
       r.opostos++;
       let res1 = p1.resultado || deduceResultado(p1);
@@ -2105,6 +2113,18 @@ function renderH2H(nome1, nome2, anoFiltro) {
            ${brow('empates',  h2h.j1.e,   h2h.j2.e)}
            ${brow('pontos',   h2h.j1.pts, h2h.j2.pts)}
            ${brow('gols',     h2h.j1.gols,h2h.j2.gols)}
+           ` : ''}
+           ${h2h.mesmo_time > 0 ? `
+           <p class="h2h-sec-lbl" style="margin-top:18px">Como dupla — ${h2h.mesmo_time} partidas no mesmo time</p>
+           <div class="h2h-duo-cards">
+             <div class="h2h-duo-card v"><span class="h2h-duo-num">${h2h.juntos.v}</span><span class="h2h-duo-lbl">vitórias</span></div>
+             <div class="h2h-duo-card e"><span class="h2h-duo-num">${h2h.juntos.e}</span><span class="h2h-duo-lbl">empates</span></div>
+             <div class="h2h-duo-card d"><span class="h2h-duo-num">${h2h.juntos.d}</span><span class="h2h-duo-lbl">derrotas</span></div>
+             <div class="h2h-duo-card a"><span class="h2h-duo-num">${(() => { const cls = h2h.juntos.v + h2h.juntos.e + h2h.juntos.d; return cls > 0 ? Math.round(h2h.juntos.pts / (cls*3) * 100) : 0; })()}%</span><span class="h2h-duo-lbl">aproveit.</span></div>
+           </div>
+           <p class="h2h-sec-lbl" style="margin-top:12px">Contribuição individual</p>
+           ${brow('gols',    h2h.juntos.gols1,    h2h.juntos.gols2)}
+           ${brow('assists', h2h.juntos.assists1, h2h.juntos.assists2)}
            ` : ''}`}
     </div>`;
 }

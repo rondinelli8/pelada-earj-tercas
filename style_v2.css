@@ -1747,12 +1747,27 @@ html.dark .site-crest,
 .h2h-together strong { color:var(--text); }
 .h2h-empty { font-size:13px; color:var(--text-muted); text-align:center; padding:16px 0; }
 
+/* Como dupla — cartões V/E/D + aproveitamento */
+.h2h-duo-cards {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+}
+.h2h-duo-card {
+  background:var(--accent-soft); border-radius:var(--radius);
+  padding:9px 4px; text-align:center;
+  display:flex; flex-direction:column; gap:2px;
+}
+.h2h-duo-num { font-size:20px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--text); }
+.h2h-duo-lbl { font-size:11px; color:var(--text-muted); }
+.h2h-duo-card.v .h2h-duo-num { color:var(--green); }
+.h2h-duo-card.d .h2h-duo-num { color:var(--red); }
+
 @media (max-width:640px) {
   .h2h-panel  { padding:14px; }
   .h2h-pname  { font-size:13px; }
   .h2h-brow   { grid-template-columns:44px 1fr 54px 1fr 44px; gap:5px; }
   .h2h-bval   { font-size:12px; }
   .h2h-select { font-size:13px; }
+  .h2h-duo-num { font-size:18px; }
 }
 
 
