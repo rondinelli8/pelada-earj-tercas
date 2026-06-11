@@ -1924,10 +1924,84 @@ function renderPartidas() {
   pushHash();
 }
 
+// ══════════════════════════════════════
+//  Mapa de posições — ordenação nos cards
+// ══════════════════════════════════════
+const POS_ORDEM = { 'GK': 0, 'ZAG': 1, 'LAT': 2, 'MEI': 3, 'ATA': 4, 'EXT': 5 };
+
+const POSICOES = {
+  // GK
+  'Weto GK': 'GK', 'Santos GK': 'GK', 'Eryk GK': 'GK', 'Joao GK': 'GK',
+  'Adriano GK': 'GK', 'Caio Coimbra GK': 'GK', 'Thiago GK': 'GK',
+  'Kadu GK': 'GK', 'Axel GK': 'GK', 'Jeff GK': 'GK', 'Michel GK': 'GK', 'Neneca GK': 'GK',
+  // ZAG
+  'C9': 'ZAG', 'Menta': 'ZAG', 'Pato': 'ZAG', 'Vico': 'ZAG',
+  'Pepe': 'ZAG', 'Bruno Barboza': 'ZAG', 'Curvello': 'ZAG', 'Pet': 'ZAG', 'Gaucho': 'ZAG',
+  // LAT
+  'Andre Lo Fiego': 'LAT', 'Rafa Rondinelli': 'LAT', 'Johnny Saraiva': 'LAT',
+  'Pu': 'LAT', 'Sertã': 'LAT', 'Victor Leubeck': 'LAT', 'Saulo Belo': 'LAT',
+  'Paulo Avelino': 'LAT', 'Taz': 'LAT', 'Serginho': 'LAT',
+  // MEI
+  'Zinho': 'MEI', 'Charif': 'MEI', 'Thiaguinho': 'MEI', 'Marquinhos': 'MEI',
+  'Bill': 'MEI', 'Caio Youle': 'MEI', 'Joaquim Mariani': 'MEI', 'Jonny Salgado': 'MEI',
+  'Ferneda (Brone)': 'MEI', 'Rato': 'MEI', 'Musa': 'MEI', 'Digo Miranda': 'MEI',
+  'Luca': 'MEI', 'Boesel': 'MEI', 'Artur Cunha': 'MEI', 'Vh': 'MEI',
+  'Nico': 'MEI', 'Jp Lemos': 'MEI',
+  // ATA
+  'Renatao': 'ATA', 'Bertazzi': 'ATA', 'Fabregas': 'ATA', 'Tavora': 'ATA',
+};
+
 function renderPartidaCard(p) {
   const times = Object.keys(p.times);
-  const ordem = ['Preto', 'Branco', ...times.filter(t => t !== 'Preto' && t !== 'Branco')];
-  const timesOrd = ordem.filter(t => times.includes(t));
+
+  // \u2500\u2500 Extrair \u00E1rbitro do bucket "Juiz" \u2500\u2500
+  const juizPlayers = p.times['Juiz'] || [];
+  const arbitroNome = juizPlayers.length
+    ? juizPlayers[0].nome.replace(' (Juiz)', '').replace(' JUIZ', '')
+    : '';
+
+  // \u2500\u2500 Separar GKs do bucket vazio e distribu\u00ED-los nos times \u2500\u2500
+  const emptyBucket = (p.times[''] || []).slice();
+  const teamKeys = times.filter(t => t !== '' && t !== 'Juiz');
+  const realTeams = teamKeys.filter(t => t === 'Preto' || t === 'Branco');
+
+  // Build enriched copies of team arrays with GKs injected
+  const enriched = {};
+  teamKeys.forEach(t => { enriched[t] = p.times[t].slice(); });
+
+  const gksFromEmpty = [];
+  const nonGksFromEmpty = [];
+  emptyBucket.forEach(pl => {
+    const isGK = pl.nome.includes(' GK') || pl.nome.includes('(Goleiro)');
+    if (isGK) gksFromEmpty.push(pl);
+    else nonGksFromEmpty.push(pl);
+  });
+
+  // Distribute GKs into real teams (one per team when possible)
+  if (realTeams.length >= 2 && gksFromEmpty.length > 0) {
+    gksFromEmpty.forEach((gk, i) => {
+      const target = realTeams[i % realTeams.length];
+      enriched[target].push(gk);
+    });
+  } else if (realTeams.length === 1 && gksFromEmpty.length > 0) {
+    gksFromEmpty.forEach(gk => enriched[realTeams[0]].push(gk));
+  }
+  // If no real teams exist (old matches), GKs stay with nonGksFromEmpty
+  if (realTeams.length === 0) {
+    gksFromEmpty.forEach(gk => nonGksFromEmpty.push(gk));
+  }
+
+  // \u2500\u2500 Ordered team keys (Preto first, then Branco, then others; skip "", "Juiz") \u2500\u2500
+  const ordem = ['Preto', 'Branco', ...teamKeys.filter(t => t !== 'Preto' && t !== 'Branco')];
+  const timesOrd = ordem.filter(t => teamKeys.includes(t));
+
+  // \u2500\u2500 Header: data + \u00E1rbitro \u2500\u2500
+  const headerHtml = arbitroNome
+    ? `<div class="partida-header-v2">
+        <span class="partida-data-v2">${formatDataBR(p.data)}</span>
+        <span class="partida-arbitro-v2">${escapeHtml(arbitroNome)}</span>
+      </div>`
+    : `<div class="partida-data-v2">${formatDataBR(p.data)}</div>`;
 
   const placarHtml = (timesOrd.includes('Preto') || timesOrd.includes('Branco'))
     ? `<div class="placar-v2">
@@ -1945,29 +2019,49 @@ function renderPartidaCard(p) {
       </div>`
     : '';
 
+  function renderPlayerLi(j) {
+    const tags = [];
+    if (j.gols)    tags.push(`<span class="stat-icon">\u26BD${j.gols > 1 ? ' '+j.gols : ''}</span>`);
+    if (j.assists) tags.push(`<span class="stat-icon">\uD83D\uDC5F${j.assists > 1 ? ' '+j.assists : ''}</span>`);
+    const tagStr = tags.length ? `<span class="stat-tags">${tags.join('')}</span>` : '';
+    const displayName = j.nome.replace(' (Goleiro)', '');
+    const isGK = j.nome.includes(' GK') || j.nome.includes('(Goleiro)');
+    const gkTag = isGK ? '<span class="gk-tag">GK</span>' : '';
+    return `<li data-jogador="${escapeAttr(j.nome)}" class="clickable">
+              <span class="jog-nome">${escapeHtml(displayName)}${gkTag}</span>${tagStr}
+            </li>`;
+  }
+
   const escalacaoHtml = `<div class="escalacao-v2">${
     timesOrd.map(t => {
-      const jogadores = p.times[t]
+      const jogadores = enriched[t]
         .slice()
-        .sort((a, b) => (b.gols + b.assists) - (a.gols + a.assists) || a.nome.localeCompare(b.nome, 'pt-BR'))
-        .map(j => {
-          const tags = [];
-          if (j.gols)    tags.push(`<span class="stat-icon">\u26BD${j.gols > 1 ? ' '+j.gols : ''}</span>`);
-          if (j.assists) tags.push(`<span class="stat-icon">\uD83D\uDC5F${j.assists > 1 ? ' '+j.assists : ''}</span>`);
-          const tagStr = tags.length ? `<span class="stat-tags">${tags.join('')}</span>` : '';
-          return `<li data-jogador="${escapeAttr(j.nome)}" class="clickable">
-                    <span class="jog-nome">${escapeHtml(j.nome.replace(' (Goleiro)', ''))}</span>${tagStr}
-                  </li>`;
-        }).join('');
+        .sort((a, b) => {
+          const posA = POS_ORDEM[POSICOES[a.nome] ?? 'EXT'] ?? 5;
+          const posB = POS_ORDEM[POSICOES[b.nome] ?? 'EXT'] ?? 5;
+          if (posA !== posB) return posA - posB;
+          return (b.gols + b.assists) - (a.gols + a.assists) || a.nome.localeCompare(b.nome, 'pt-BR');
+        })
+        .map(renderPlayerLi).join('');
       return `<div class="time-col">
         <h4 class="time-col-header">${t === 'Preto' ? '\u26AB' : '\u26AA'} ${escapeHtml(t)}</h4>
         <ul>${jogadores}</ul>
       </div>`;
     }).join('')
+  }${
+    // Old matches with no team data: show all players in a single column
+    nonGksFromEmpty.length > 0 && timesOrd.length === 0
+      ? `<div class="time-col time-col-full">
+          <h4 class="time-col-header">Jogadores</h4>
+          <ul>${nonGksFromEmpty
+            .sort((a, b) => (b.gols + b.assists) - (a.gols + a.assists) || a.nome.localeCompare(b.nome, 'pt-BR'))
+            .map(renderPlayerLi).join('')}</ul>
+         </div>`
+      : ''
   }</div>`;
 
   return `<article class="partida-card-v2">
-    <div class="partida-data-v2">${formatDataBR(p.data)}</div>
+    ${headerHtml}
     ${placarHtml}
     ${escalacaoHtml}
   </article>`;
@@ -2280,15 +2374,15 @@ function renderComparar() {
     <div class="h2h-section">
       <div class="h2h-selectors">
         <select id="h2h-j1" class="h2h-select">
-          <option value="">Escolha o jogador 1…</option>${h2hOpts}
+          <option value="">Escolha o jogador 1\u2026</option>${h2hOpts}
         </select>
         <div class="h2h-vs">VS</div>
         <select id="h2h-j2" class="h2h-select">
-          <option value="">Escolha o jogador 2…</option>${h2hOpts}
+          <option value="">Escolha o jogador 2\u2026</option>${h2hOpts}
         </select>
       </div>
       <div class="h2h-ano-bar">
-        <span class="mes-filter-label">📅 Período:</span>
+        <span class="mes-filter-label">\uD83D\uDCC5 Per\u00EDodo:</span>
         <div class="pill-group h2h-ano-pills">${anoPills}</div>
       </div>
       <div id="h2h-result"></div>
