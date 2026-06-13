@@ -238,6 +238,7 @@ function onHashChange() {
 function activateTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  syncDestaquesVisibility();
 }
 
 // ══════════════════════════════════════
@@ -467,6 +468,15 @@ function updateMesFilter() {
 // ══════════════════════════════════════
 //  Tabs
 // ══════════════════════════════════════
+function syncDestaquesVisibility() {
+  const section = document.getElementById('destaques-section');
+  if (!section) return;
+  const activeTab = document.querySelector('.tab-btn.active');
+  const tab = activeTab ? activeTab.dataset.tab : 'rankings';
+  const show = (tab === 'rankings' || tab === 'recordes');
+  section.style.display = show ? '' : 'none';
+}
+
 function setupTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -474,6 +484,7 @@ function setupTabs() {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      syncDestaquesVisibility();
       pushHash();
       if (isMobile()) updateMobileBar();
     });
