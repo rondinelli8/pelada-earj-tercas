@@ -293,12 +293,12 @@ function computeStatsByFilter(ano, mes) {
   const maisJogos = linha.slice().sort((a, b) => b.jogos - a.jogos)[0];
   const maisAssists = linha.slice().sort((a, b) => b.assists - a.assists)[0];
 
-  // Mínimo de jogos para aproveitamento: >= 75% das partidas da temporada (mín 3)
+  // Mínimo de jogos para aproveitamento: 14 jogos (ou 3 se filtro mensal)
   let minJogosAprov;
   if (mes && mes !== 'todos') {
     minJogosAprov = 3;
   } else {
-    minJogosAprov = Math.max(3, Math.round(totalPartidas * 0.75));
+    minJogosAprov = 14;
   }
 
   const melhorAprov = linha.filter(p => p.jogos >= minJogosAprov)
