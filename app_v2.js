@@ -293,15 +293,12 @@ function computeStatsByFilter(ano, mes) {
   const maisJogos = linha.slice().sort((a, b) => b.jogos - a.jogos)[0];
   const maisAssists = linha.slice().sort((a, b) => b.assists - a.assists)[0];
 
-  // Mínimo de jogos para aproveitamento: proporcional ao total de partidas
-  // Temporada completa (>= 30 partidas): 15 jogos. Senão: ~40% das partidas (mín 3)
+  // Mínimo de jogos para aproveitamento: >= 75% das partidas da temporada (mín 3)
   let minJogosAprov;
   if (mes && mes !== 'todos') {
     minJogosAprov = 3;
-  } else if (totalPartidas >= 30) {
-    minJogosAprov = 15;
   } else {
-    minJogosAprov = Math.max(3, Math.round(totalPartidas * 0.4));
+    minJogosAprov = Math.max(3, Math.round(totalPartidas * 0.75));
   }
 
   const melhorAprov = linha.filter(p => p.jogos >= minJogosAprov)
@@ -401,7 +398,7 @@ function renderDestaques() {
       <span class="dest-indiv-icon">${it.icon}</span>
       <div class="dest-indiv-info">
         <span class="dest-indiv-label">${it.label}</span>
-        <span class="dest-indiv-name">${escapeHtml(it.data.nome.replace(' (Goleiro)', ''))}</span>
+        <span class="dest-indiv-name">${escapeHtml(it.data.nome.replace(' GK', '').replace(' (Goleiro)', ''))}</span>
         <span class="dest-indiv-stat">${it.fmt(it.data)}</span>
       </div>
     </div>`
@@ -821,7 +818,7 @@ function renderRanking() {
     : golSorted.map((g, i) => `
         <tr class="clickable" data-jogador="${escapeAttr(g.nome)}">
           <td class="num ${(usarMedalhas && i < 3) ? 'rank-medal' : 'rank-cell'}">${(usarMedalhas && i < 3) ? ['🥇','🥈','🥉'][i] : i+1}</td>
-          <td class="player-cell">${escapeHtml(g.nome.replace(' (Goleiro)', ''))}</td>
+          <td class="player-cell">${escapeHtml(g.nome.replace(' GK', '').replace(' (Goleiro)', ''))}</td>
           <td class="num">${g.jogos}</td>
           <td class="num">${g.vitorias}</td>
           <td class="num">${g.empates}</td>
