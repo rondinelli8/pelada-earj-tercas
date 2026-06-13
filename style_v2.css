@@ -681,17 +681,36 @@ input[type="search"]:focus {
 .mes-grupo { margin-bottom: 36px; }
 .mes-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 2px solid var(--border);
 }
+.mes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.mes-toggle:hover .mes-label { color: var(--accent); }
+.mes-chevron {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.mes-toggle:hover .mes-chevron { color: var(--accent); }
 .mes-label {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.01em;
+  transition: color 0.15s;
 }
 .mes-count { font-size: 12px; color: var(--text-muted); }
 
@@ -700,6 +719,7 @@ input[type="search"]:focus {
   grid-template-columns: 1fr;
   gap: 16px;
 }
+.partidas-list-mes.collapsed { display: none; }
 @media (min-width: 700px) {
   .partidas-list-mes { grid-template-columns: repeat(2, 1fr); }
 }
@@ -786,12 +806,17 @@ input[type="search"]:focus {
 .placar-team {
   display: flex;
   align-items: center;
+  flex: 1;
+}
+.placar-label {
+  display: flex;
+  align-items: center;
   gap: 7px;
   flex: 1;
+  justify-content: center;
 }
 .placar-team-right {
   justify-content: flex-end;
-  flex-direction: row-reverse;
 }
 .placar-nome {
   font-size: 12px;

@@ -1761,13 +1761,15 @@ function buildPartidasSidebar() {
 
   const anos = [...DATA.meta.anos_disponiveis.slice().reverse().map(String)];
 
-  // Meses disponíveis por ano
+  // Meses disponíveis e contagem de partidas por ano
   const mesesPorAno = {};
+  const contagemPorAno = {};
   DATA.partidas.forEach(p => {
     const a = String(p.ano);
     const m = p.data.slice(5, 7);
     if (!mesesPorAno[a]) mesesPorAno[a] = new Set();
     mesesPorAno[a].add(m);
+    contagemPorAno[a] = (contagemPorAno[a] || 0) + 1;
   });
 
   const todosItem = `
@@ -1780,7 +1782,7 @@ function buildPartidasSidebar() {
 
   const anosItems = anos.map(a => {
     const isActive = STATE.partidas.ano === a;
-    const meses = mesesPorAno[a] ? [...mesesPorAno[a]].sort().reverse() : [];
+    const meses = mesesPorAno[a] ? [...mesesPorAno[a]].sort() : [];
     const mesesBtns = [
       `<button class="sidebar-sub-btn ${isActive && STATE.partidas.mes === 'todos' ? 'active' : ''}"
         data-ano="${a}" data-mes="todos">Todos os meses</button>`,
@@ -1796,6 +1798,7 @@ function buildPartidasSidebar() {
         <button class="sidebar-year-btn ${isActive ? 'active' : ''}" data-ano="${a}">
           <span class="chevron">${isActive ? '▾' : '▸'}</span>
           <span>${a}</span>
+          ${contagemPorAno[a] ? `<span class="sidebar-year-count">${contagemPorAno[a]}j</span>` : ''}
         </button>
         <div class="sidebar-year-sub ${isActive ? 'open' : ''}">
           ${mesesBtns}
@@ -1907,16 +1910,30 @@ function renderPartidas() {
     return `
       <div class="mes-grupo">
         <div class="mes-header">
-          <span class="mes-label">${mesLabel}</span>
+          <button class="mes-toggle" data-mes-key="${key}">
+            <span class="mes-chevron">▾</span>
+            <span class="mes-label">${mesLabel}</span>
+          </button>
           <span class="mes-count">${partidas.length} partida${partidas.length > 1 ? 's' : ''}</span>
         </div>
-        <div class="partidas-list-mes">
+        <div class="partidas-list-mes" data-mes-body="${key}">
           ${partidas.map(p => renderPartidaCard(p)).join('')}
         </div>
       </div>`;
   }).join('');
 
   wrap.onclick = e => {
+    const toggleBtn = e.target.closest('.mes-toggle');
+    if (toggleBtn) {
+      const key = toggleBtn.dataset.mesKey;
+      const body = wrap.querySelector(`.partidas-list-mes[data-mes-body="${key}"]`);
+      if (body) {
+        const collapsed = body.classList.toggle('collapsed');
+        const chevron = toggleBtn.querySelector('.mes-chevron');
+        if (chevron) chevron.textContent = collapsed ? '▸' : '▾';
+      }
+      return;
+    }
     const li = e.target.closest('li[data-jogador]');
     if (li) abrirJogador(li.dataset.jogador);
   };
@@ -2003,21 +2020,17 @@ function renderPartidaCard(p) {
       </div>`
     : `<div class="partida-data-v2">${formatDataBR(p.data)}</div>`;
 
-  const placarHtml = (timesOrd.includes('Preto') || timesOrd.includes('Branco'))
-    ? `<div class="placar-v2">
+  const placarHtml = `<div class="placar-v2">
         <div class="placar-team">
-          <span class="badge-circle preto"></span>
-          <span class="placar-nome">Preto</span>
+          <span class="placar-label"><span class="badge-circle preto"></span><span class="placar-nome">Preto</span></span>
           <span class="placar-score">${p.placar_p ?? '\u2014'}</span>
         </div>
         <span class="placar-sep">\u00D7</span>
         <div class="placar-team placar-team-right">
           <span class="placar-score">${p.placar_b ?? '\u2014'}</span>
-          <span class="placar-nome">Branco</span>
-          <span class="badge-circle branco"></span>
+          <span class="placar-label"><span class="placar-nome">Branco</span><span class="badge-circle branco"></span></span>
         </div>
-      </div>`
-    : '';
+      </div>`;
 
   function renderPlayerLi(j) {
     const tags = [];
