@@ -2045,7 +2045,7 @@ function renderPartidaCard(p) {
     if (j.gols)    tags.push(`<span class="stat-icon">\u26BD${j.gols > 1 ? ' '+j.gols : ''}</span>`);
     if (j.assists) tags.push(`<span class="stat-icon">\uD83D\uDC5F${j.assists > 1 ? ' '+j.assists : ''}</span>`);
     const tagStr = tags.length ? `<span class="stat-tags">${tags.join('')}</span>` : '';
-    const displayName = j.nome.replace(' (Goleiro)', '');
+    const displayName = j.nome.replace(' (Goleiro)', '').replace(' GK', '');
     const isGK = j.nome.includes(' GK') || j.nome.includes('(Goleiro)');
     const gkTag = isGK ? '<span class="gk-tag">GK</span>' : '';
     return `<li data-jogador="${escapeAttr(j.nome)}" class="clickable">
@@ -2116,8 +2116,6 @@ function computeH2H(nome1, nome2, anoFiltro) {
 
   for (const dt of comuns) {
     const p1 = map1.get(dt), p2 = map2.get(dt);
-    r.j1.gols    += p1.gols;    r.j2.gols    += p2.gols;
-    r.j1.assists += p1.assists; r.j2.assists += p2.assists;
     const t1 = p1.time || '';
     const t2 = p2.time || '';
     // Se um dos dois não tem time conhecido → conta como mesmo_time (indeterminado)
@@ -2132,6 +2130,8 @@ function computeH2H(nome1, nome2, anoFiltro) {
       r.juntos.d += resD==='D'?1:0; r.juntos.pts += (resD==='V'?3:resD==='E'?1:0);
     } else {
       r.opostos++;
+      r.j1.gols    += p1.gols;    r.j2.gols    += p2.gols;
+      r.j1.assists += p1.assists; r.j2.assists += p2.assists;
       let res1 = p1.resultado || deduceResultado(p1);
       let res2 = p2.resultado || deduceResultado(p2);
       // Se um lado vazio, infere pelo oposto
@@ -2228,6 +2228,7 @@ function renderH2H(nome1, nome2, anoFiltro) {
            ${brow('empates',  h2h.j1.e,   h2h.j2.e)}
            ${brow('pontos',   h2h.j1.pts, h2h.j2.pts)}
            ${brow('gols',     h2h.j1.gols,h2h.j2.gols)}
+           ${brow('assists',  h2h.j1.assists,h2h.j2.assists)}
            ` : ''}
            ${h2h.mesmo_time > 0 ? `
            <p class="h2h-sec-lbl" style="margin-top:18px">Como dupla — ${h2h.mesmo_time} partidas no mesmo time</p>
