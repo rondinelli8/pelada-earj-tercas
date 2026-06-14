@@ -652,7 +652,7 @@ function setupLimiteFilter() {
 //  Render Ranking
 // ══════════════════════════════════════
 function formDots(partidas, n = 5) {
-  return (partidas || []).slice(0, n).map(p => {
+  return (partidas || []).slice(0, n).reverse().map(p => {
     const cls = p.resultado === 'V' ? 'dot-v' : p.resultado === 'E' ? 'dot-e' : 'dot-d';
     return `<span class="form-dot ${cls}" title="${formatDataBR(p.data)}">${p.resultado}</span>`;
   }).join('');
