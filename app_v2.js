@@ -623,6 +623,7 @@ function syncLimitePills() {
 
 function setupMetricaFilter() {
   const wrap = document.getElementById('filter-metrica');
+  if (!wrap) return;
   wrap.addEventListener('click', e => {
     const b = e.target.closest('button[data-metrica]');
     if (!b) return;
@@ -964,20 +965,6 @@ function renderSheetFiltros() {
     { k: 'goleiros', label: '🧤 Goleiros'  },
     { k: 'corrida',  label: '🏁 Corrida'   },
   ];
-  const grupos = [
-    { label: 'Desempenho', items: [
-      { k: 'pontos',             label: '🏆 Pontos'     },
-      { k: 'aproveitamento',     label: '📈 Aproveit.'  },
-      { k: 'aproveitamento_pior',label: '📉 Pior Aprov.'},
-      { k: 'jogos',              label: '🏟️ Jogos'      },
-    ]},
-    { label: 'Ataque', items: [
-      { k: 'gols',     label: '⚽ Gols'   },
-      { k: 'assists',  label: '👟 Assists' },
-      { k: 'g_a',      label: '🎯 G+A'   },
-      { k: 'g_a_jogo', label: '🎯 G+A/J' },
-    ]},
-  ];
   const limites = [
     { v: 10, label: 'Top 10' },
     { v: 20, label: 'Top 20' },
@@ -993,16 +980,6 @@ function renderSheetFiltros() {
         `).join('')}
       </div>
     </div>
-    ${grupos.map(g => `
-      <div class="sheet-section">
-        <div class="sheet-section-label">${g.label}</div>
-        <div class="sheet-pill-row">
-          ${g.items.map(it => `
-            <button class="sheet-pill${STATE.ranking.metrica === it.k ? ' active' : ''}" data-metrica="${it.k}">${it.label}</button>
-          `).join('')}
-        </div>
-      </div>
-    `).join('')}
     <div class="sheet-section">
       <div class="sheet-section-label">Mostrar</div>
       <div class="sheet-pill-row">
