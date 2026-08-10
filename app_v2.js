@@ -1936,21 +1936,33 @@ const POSICOES = {
   'Weto GK': 'GK', 'Santos GK': 'GK', 'Eryk GK': 'GK', 'Joao GK': 'GK',
   'Adriano GK': 'GK', 'Caio Coimbra GK': 'GK', 'Thiago GK': 'GK',
   'Kadu GK': 'GK', 'Axel GK': 'GK', 'Jeff GK': 'GK', 'Michel GK': 'GK', 'Neneca GK': 'GK',
+  'Hugo (GK)': 'GK', 'Daniel (GK)': 'GK',
   // ZAG
   'C9': 'ZAG', 'Menta': 'ZAG', 'Pato': 'ZAG', 'Vico': 'ZAG',
   'Pepe': 'ZAG', 'Bruno Barboza': 'ZAG', 'Curvello': 'ZAG', 'Pet': 'ZAG', 'Gaucho': 'ZAG',
+  'Marcinho': 'ZAG', 'Rangel': 'ZAG', 'Gertum': 'ZAG', 'Denis': 'ZAG',
+  'Xandão': 'ZAG', 'Pedro Amaral': 'ZAG',
   // LAT
-  'Andre Lo Fiego': 'LAT', 'Rafa Rondinelli': 'LAT', 'Johnny Saraiva': 'LAT',
+  'Andre Lo Fiego': 'LAT', 'Rafael Rondinelli': 'LAT', 'Johnny Saraiva': 'LAT',
   'Pu': 'LAT', 'Sertã': 'LAT', 'Victor Leubeck': 'LAT', 'Saulo Belo': 'LAT',
   'Paulo Avelino': 'LAT', 'Taz': 'LAT', 'Serginho': 'LAT',
+  'Pedrinho': 'LAT', 'Luigi': 'LAT', 'Correa': 'LAT', 'Avelino': 'LAT',
+  'Antonio Bento': 'LAT', 'Davi Reale': 'LAT', 'Antonio Rocha': 'LAT',
+  'Felipe Pinto': 'LAT', 'Thi (Amaral)': 'LAT', 'Yago (Rael)': 'LAT',
+  'Luizinho': 'LAT', 'Naveiro': 'LAT', 'Leo Barros': 'LAT',
   // MEI
   'Zinho': 'MEI', 'Charif': 'MEI', 'Thiaguinho': 'MEI', 'Marquinhos': 'MEI',
   'Bill': 'MEI', 'Caio Youle': 'MEI', 'Joaquim Mariani': 'MEI', 'Jonny Salgado': 'MEI',
   'Ferneda (Brone)': 'MEI', 'Rato': 'MEI', 'Musa': 'MEI', 'Digo Miranda': 'MEI',
   'Luca': 'MEI', 'Boesel': 'MEI', 'Artur Cunha': 'MEI', 'Vh': 'MEI',
   'Nico': 'MEI', 'Jp Lemos': 'MEI',
+  'Kante': 'MEI', 'Rael': 'MEI', 'Viegas': 'MEI', 'Frank (Marcinho)': 'MEI',
+  'Renato Vianna': 'MEI', 'Th': 'MEI', 'Teti': 'MEI', 'Antonio Ferreira': 'MEI',
+  'Pato 2': 'MEI', 'Pedro Noronha': 'MEI', 'Caio Voz': 'MEI',
   // ATA
   'Renatao': 'ATA', 'Bertazzi': 'ATA', 'Fabregas': 'ATA', 'Tavora': 'ATA',
+  'Freire': 'ATA', 'Fabricio': 'ATA', 'Igor': 'ATA',
+  'Frank': 'MEI',
 };
 
 function renderPartidaCard(p) {
