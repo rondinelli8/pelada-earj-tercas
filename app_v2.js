@@ -398,7 +398,7 @@ function renderDestaques() {
       <span class="dest-indiv-icon">${it.icon}</span>
       <div class="dest-indiv-info">
         <span class="dest-indiv-label">${it.label}</span>
-        <span class="dest-indiv-name">${escapeHtml(it.data.nome.replace(' GK', '').replace(' (Goleiro)', ''))}</span>
+        <span class="dest-indiv-name">${escapeHtml(it.data.nome.replace(' (GK)', '').replace(' GK', '').replace(' (Goleiro)', ''))}</span>
         <span class="dest-indiv-stat">${it.fmt(it.data)}</span>
       </div>
     </div>`
@@ -819,7 +819,7 @@ function renderRanking() {
     : golSorted.map((g, i) => `
         <tr class="clickable" data-jogador="${escapeAttr(g.nome)}">
           <td class="num ${(usarMedalhas && i < 3) ? 'rank-medal' : 'rank-cell'}">${(usarMedalhas && i < 3) ? ['🥇','🥈','🥉'][i] : i+1}</td>
-          <td class="player-cell">${escapeHtml(g.nome.replace(' GK', '').replace(' (Goleiro)', ''))}</td>
+          <td class="player-cell">${escapeHtml(g.nome.replace(' (GK)', '').replace(' GK', '').replace(' (Goleiro)', ''))}</td>
           <td class="num">${g.jogos}</td>
           <td class="num">${g.vitorias}</td>
           <td class="num">${g.empates}</td>
@@ -1936,12 +1936,12 @@ const POSICOES = {
   'Weto GK': 'GK', 'Santos GK': 'GK', 'Eryk GK': 'GK', 'Joao GK': 'GK',
   'Adriano GK': 'GK', 'Caio Coimbra GK': 'GK', 'Thiago GK': 'GK',
   'Kadu GK': 'GK', 'Axel GK': 'GK', 'Jeff GK': 'GK', 'Michel GK': 'GK', 'Neneca GK': 'GK',
-  'Hugo (GK)': 'GK', 'Daniel (GK)': 'GK',
+  'Hugo (GK)': 'GK', 'Daniel (GK)': 'GK', 'Joao Victor Orelha GK': 'GK',
   // ZAG
   'C9': 'ZAG', 'Menta': 'ZAG', 'Pato': 'ZAG', 'Vico': 'ZAG',
   'Pepe': 'ZAG', 'Bruno Barboza': 'ZAG', 'Curvello': 'ZAG', 'Pet': 'ZAG', 'Gaucho': 'ZAG',
   'Marcinho': 'ZAG', 'Rangel': 'ZAG', 'Gertum': 'ZAG', 'Denis': 'ZAG',
-  'Xandão': 'ZAG', 'Pedro Amaral': 'ZAG',
+  'Xandão': 'ZAG', 'Pedro Amaral': 'ZAG', 'Toby (Brone)': 'ZAG',
   // LAT
   'Andre Lo Fiego': 'LAT', 'Rafael Rondinelli': 'LAT', 'Johnny Saraiva': 'LAT',
   'Pu': 'LAT', 'Sertã': 'LAT', 'Victor Leubeck': 'LAT', 'Saulo Belo': 'LAT',
@@ -1950,6 +1950,7 @@ const POSICOES = {
   'Antonio Bento': 'LAT', 'Davi Reale': 'LAT', 'Antonio Rocha': 'LAT',
   'Felipe Pinto': 'LAT', 'Thi (Amaral)': 'LAT', 'Yago (Rael)': 'LAT',
   'Luizinho': 'LAT', 'Naveiro': 'LAT', 'Leo Barros': 'LAT',
+  'Rafael Tabet': 'LAT', 'Lucas Leal': 'LAT', 'Gabriel (Brone)': 'LAT', 'Mogli': 'LAT',
   // MEI
   'Zinho': 'MEI', 'Charif': 'MEI', 'Thiaguinho': 'MEI', 'Marquinhos': 'MEI',
   'Bill': 'MEI', 'Caio Youle': 'MEI', 'Joaquim Mariani': 'MEI', 'Jonny Salgado': 'MEI',
@@ -1958,11 +1959,17 @@ const POSICOES = {
   'Nico': 'MEI', 'Jp Lemos': 'MEI',
   'Kante': 'MEI', 'Rael': 'MEI', 'Viegas': 'MEI', 'Frank (Marcinho)': 'MEI',
   'Renato Vianna': 'MEI', 'Th': 'MEI', 'Teti': 'MEI', 'Antonio Ferreira': 'MEI',
-  'Pato 2': 'MEI', 'Pedro Noronha': 'MEI', 'Caio Voz': 'MEI',
+  'Pato 2': 'MEI', 'Pedro Noronha': 'MEI', 'Caio Voz': 'MEI', 'Thiago Oliveira': 'MEI',
   // ATA
   'Renatao': 'ATA', 'Bertazzi': 'ATA', 'Fabregas': 'ATA', 'Tavora': 'ATA',
   'Freire': 'ATA', 'Fabricio': 'ATA', 'Igor': 'ATA',
   'Frank': 'MEI',
+  // EXT — apareceram apenas no bloco "Extra" das listas de agosto/2026.
+  // "Extra" e banco/excedente, nao posicao: EXT ja e o fallback, ficam
+  // explicitos so para registrar que foram conferidos no chat.
+  'Zarur': 'EXT', 'Wright': 'EXT', 'Bernardo Lacerda': 'EXT',
+  'Fred (Marcinho)': 'EXT', 'Alexandre Costa (Thiaguinho)': 'EXT',
+  'Gustavo Linhares': 'EXT', 'Eduardo Barbara': 'EXT',
 };
 
 function renderPartidaCard(p) {
@@ -1986,7 +1993,7 @@ function renderPartidaCard(p) {
   const gksFromEmpty = [];
   const nonGksFromEmpty = [];
   emptyBucket.forEach(pl => {
-    const isGK = pl.nome.includes(' GK') || pl.nome.includes('(Goleiro)');
+    const isGK = pl.nome.includes(' GK') || pl.nome.includes('(GK)') || pl.nome.includes('(Goleiro)');
     if (isGK) gksFromEmpty.push(pl);
     else nonGksFromEmpty.push(pl);
   });
@@ -2034,8 +2041,8 @@ function renderPartidaCard(p) {
     if (j.gols)    tags.push(`<span class="stat-icon">\u26BD${j.gols > 1 ? ' '+j.gols : ''}</span>`);
     if (j.assists) tags.push(`<span class="stat-icon">\uD83D\uDC5F${j.assists > 1 ? ' '+j.assists : ''}</span>`);
     const tagStr = tags.length ? `<span class="stat-tags">${tags.join('')}</span>` : '';
-    const displayName = j.nome.replace(' (Goleiro)', '').replace(' GK', '');
-    const isGK = j.nome.includes(' GK') || j.nome.includes('(Goleiro)');
+    const displayName = j.nome.replace(' (Goleiro)', '').replace(' (GK)', '').replace(' GK', '');
+    const isGK = j.nome.includes(' GK') || j.nome.includes('(GK)') || j.nome.includes('(Goleiro)');
     const gkTag = isGK ? '<span class="gk-tag">GK</span>' : '';
     return `<li data-jogador="${escapeAttr(j.nome)}" class="clickable">
               <span class="jog-nome">${escapeHtml(displayName)}${gkTag}</span>${tagStr}
