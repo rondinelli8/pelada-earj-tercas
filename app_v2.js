@@ -1970,6 +1970,10 @@ const POSICOES = {
   'Zarur': 'EXT', 'Wright': 'EXT', 'Bernardo Lacerda': 'EXT',
   'Fred (Marcinho)': 'EXT', 'Alexandre Costa (Thiaguinho)': 'EXT',
   'Gustavo Linhares': 'EXT', 'Eduardo Barbara': 'EXT',
+  // setembro/2026 — posicao pela secao da lista do WhatsApp
+  'Henrique (Rael)': 'ZAG', 'Caetano': 'ZAG', 'Aderbal (Marcinho)': 'ZAG', 'Joao Pedro': 'ZAG',
+  'Victor Freire (Zinho)': 'MEI', 'Dobes': 'MEI',
+  'Carsa (Marcinho)': 'EXT', 'Crianza': 'EXT', 'PH (Nico)': 'EXT', 'Cereja': 'EXT',
 };
 
 function renderPartidaCard(p) {
@@ -2040,6 +2044,7 @@ function renderPartidaCard(p) {
     const tags = [];
     if (j.gols)    tags.push(`<span class="stat-icon">\u26BD${j.gols > 1 ? ' '+j.gols : ''}</span>`);
     if (j.assists) tags.push(`<span class="stat-icon">\uD83D\uDC5F${j.assists > 1 ? ' '+j.assists : ''}</span>`);
+    if (j.gols_contra) tags.push(`<span class="stat-icon gol-contra" title="Gol contra"><svg class="bola-vermelha" viewBox="0 0 20 20" width="1.1em" height="1.1em" style="vertical-align:-0.18em" aria-label="Gol contra"><circle cx="10" cy="10" r="9" fill="#d32f2f" stroke="#7f1010" stroke-width="1"/><polygon points="10,6 13.3,8.4 12,12.2 8,12.2 6.7,8.4" fill="#fff"/><path d="M10 6V1.5M13.3 8.4l4.2-1.4M12 12.2l2.6 3.7M8 12.2l-2.6 3.7M6.7 8.4L2.5 7" stroke="#fff" stroke-width="1.2" fill="none"/></svg>${j.gols_contra > 1 ? ' '+j.gols_contra : ''}</span>`);
     const tagStr = tags.length ? `<span class="stat-tags">${tags.join('')}</span>` : '';
     const displayName = j.nome.replace(' (Goleiro)', '').replace(' (GK)', '').replace(' GK', '');
     const isGK = j.nome.includes(' GK') || j.nome.includes('(GK)') || j.nome.includes('(Goleiro)');
