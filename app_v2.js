@@ -1974,6 +1974,9 @@ const POSICOES = {
   'Henrique (Rael)': 'ZAG', 'Caetano': 'ZAG', 'Aderbal (Marcinho)': 'ZAG', 'Joao Pedro': 'ZAG',
   'Victor Freire (Zinho)': 'MEI', 'Dobes': 'MEI',
   'Carsa (Marcinho)': 'EXT', 'Crianza': 'EXT', 'PH (Nico)': 'EXT', 'Cereja': 'EXT',
+  // outubro/2026 — posicao pela secao da lista do WhatsApp
+  'Yuri': 'MEI', 'Xandinho': 'MEI', 'Hanri': 'ATA',
+  'Hygor (Marquinhos)': 'EXT', 'Rodrigo Jr': 'EXT', 'Andre Leal': 'EXT', 'Marlon': 'EXT', 'Faveret': 'EXT',
 };
 
 function renderPartidaCard(p) {
