@@ -1946,7 +1946,7 @@ const POSICOES = {
   'Andre Lo Fiego': 'LAT', 'Rafael Rondinelli': 'LAT', 'Johnny Saraiva': 'LAT',
   'Pu': 'LAT', 'Sertã': 'LAT', 'Victor Leubeck': 'LAT', 'Saulo Belo': 'LAT',
   'Paulo Avelino': 'LAT', 'Taz': 'LAT', 'Serginho': 'LAT',
-  'Pedrinho': 'LAT', 'Luigi': 'LAT', 'Correa': 'LAT', 'Avelino': 'LAT',
+  'Pedro Noronha': 'LAT', 'Luigi': 'LAT', 'Correa': 'LAT', 'Avelino': 'LAT',
   'Antonio Bento': 'LAT', 'Davi Reale': 'LAT', 'Antonio Rocha': 'LAT',
   'Felipe Pinto': 'LAT', 'Thi (Amaral)': 'LAT', 'Yago (Rael)': 'LAT',
   'Luizinho': 'LAT', 'Naveiro': 'LAT', 'Leo Barros': 'LAT',
@@ -1959,7 +1959,7 @@ const POSICOES = {
   'Nico': 'MEI', 'Jp Lemos': 'MEI',
   'Kante': 'MEI', 'Rael': 'MEI', 'Viegas': 'MEI', 'Frank (Marcinho)': 'MEI',
   'Renato Vianna': 'MEI', 'Th': 'MEI', 'Teti': 'MEI', 'Antonio Ferreira': 'MEI',
-  'Pato 2': 'MEI', 'Pedro Noronha': 'MEI', 'Caio Voz': 'MEI', 'Thiago Oliveira': 'MEI',
+  'Pato 2': 'MEI', 'Caio Voz': 'MEI', 'Thiago Oliveira': 'MEI',
   // ATA
   'Renatao': 'ATA', 'Bertazzi': 'ATA', 'Fabregas': 'ATA', 'Tavora': 'ATA',
   'Freire': 'ATA', 'Fabricio': 'ATA', 'Igor': 'ATA',
